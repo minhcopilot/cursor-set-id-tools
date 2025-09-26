@@ -64,81 +64,36 @@ function Test-Administrator {
 
 # Hàm cài đặt chính
 function Install-CursorSetIdTools {
-    # Hiển thị banner
-    Write-Host ""
-    Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Blue
-    Write-Host "║              Trình Cài Đặt Cursor Set ID Tools               ║" -ForegroundColor Blue
-    Write-Host "║            Script Cài Đặt Tự Động cho Windows               ║" -ForegroundColor Blue
-    Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Blue
-    Write-Host ""
-
-    # Kiểm tra có chạy với quyền administrator không
-    if (Test-Administrator) {
-        Write-Success "Đang chạy với quyền Administrator"
-    } else {
-        Write-Warning "Không chạy với quyền Administrator. Một số tính năng có thể cần quyền admin sau này."
-    }
+    Write-Info "Bắt đầu cài đặt Cursor Set ID Tools..."
 
     # Kiểm tra Python đã được cài đặt chưa
     if (-not (Test-Command "python")) {
-        Write-Error "Python chưa được cài đặt hoặc không có trong PATH."
-        Write-Host "Vui lòng cài đặt Python 3.7+ từ https://www.python.org/downloads/" -ForegroundColor Yellow
-        Write-Host "Đảm bảo chọn 'Add Python to PATH' trong quá trình cài đặt" -ForegroundColor Yellow
+        Write-Error "Python chưa được cài đặt. Vui lòng cài đặt Python 3.7+ từ https://www.python.org/downloads/"
         Read-Host "Nhấn Enter để thoát"
-        exit 1
-    }
-
-    # Lấy phiên bản Python
-    try {
-        $pythonVersion = python --version 2>&1
-        Write-Success "Đã tìm thấy Python: $pythonVersion"
-    } catch {
-        Write-Error "Không thể lấy phiên bản Python"
         exit 1
     }
 
     # Kiểm tra pip có sẵn không
     if (-not (Test-Command "pip")) {
-        Write-Error "pip chưa được cài đặt hoặc không có trong PATH."
-        Write-Host "Vui lòng cài đặt lại Python với pip đi kèm" -ForegroundColor Yellow
+        Write-Error "pip chưa được cài đặt. Vui lòng cài đặt lại Python với pip đi kèm"
         Read-Host "Nhấn Enter để thoát"
-        exit 1
-    }
-
-    try {
-        $pipVersion = pip --version 2>&1
-        Write-Success "Đã tìm thấy pip: $pipVersion"
-    } catch {
-        Write-Error "Không thể lấy phiên bản pip"
         exit 1
     }
 
     # Kiểm tra git đã được cài đặt chưa
     if (-not (Test-Command "git")) {
-        Write-Error "Git chưa được cài đặt hoặc không có trong PATH."
-        Write-Host "Vui lòng cài đặt Git từ https://git-scm.com/download/win" -ForegroundColor Yellow
+        Write-Error "Git chưa được cài đặt. Vui lòng cài đặt Git từ https://git-scm.com/download/win"
         Read-Host "Nhấn Enter để thoát"
-        exit 1
-    }
-
-    try {
-        $gitVersion = git --version 2>&1
-        Write-Success "Đã tìm thấy Git: $gitVersion"
-    } catch {
-        Write-Error "Không thể lấy phiên bản Git"
         exit 1
     }
 
     # Thiết lập thư mục cài đặt
     $InstallDir = Join-Path $env:USERPROFILE "cursor-set-id-tools"
-    Write-Info "Thư mục cài đặt: $InstallDir"
 
     # Xóa thư mục hiện có nếu tồn tại
     if (Test-Path $InstallDir) {
-        Write-Warning "Thư mục $InstallDir đã tồn tại. Đang xóa..."
         try {
             Remove-Item -Path $InstallDir -Recurse -Force
-            Write-Success "Đã xóa thư mục hiện có"
         } catch {
             Write-Error "Không thể xóa thư mục hiện có: $_"
             Read-Host "Nhấn Enter để thoát"
@@ -147,13 +102,11 @@ function Install-CursorSetIdTools {
     }
 
     # Clone repository
-    Write-Install "Đang clone repository cursor-set-id-tools..."
+    Write-Install "Đang tải xuống..."
     try {
-        git clone https://github.com/minhcopilot/cursor-set-id-tools.git $InstallDir
-        Write-Success "Clone repository thành công!"
+        git clone https://github.com/minhcopilot/cursor-set-id-tools.git $InstallDir 2>$null
     } catch {
-        Write-Error "Không thể clone repository. Vui lòng kiểm tra kết nối internet."
-        Write-Host "Lỗi: $_" -ForegroundColor Red
+        Write-Error "Không thể tải xuống. Vui lòng kiểm tra kết nối internet."
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
@@ -162,94 +115,36 @@ function Install-CursorSetIdTools {
     Set-Location $InstallDir
 
     # Cài đặt Python dependencies
-    Write-Install "Đang cài đặt Python dependencies..."
+    Write-Install "Đang cài đặt..."
     try {
-        pip install -r requirements.txt
-        Write-Success "Cài đặt dependencies thành công!"
+        pip install -r requirements.txt --quiet
     } catch {
-        Write-Error "Không thể cài đặt dependencies: $_"
-        Write-Install "Thử với flag --user..."
         try {
-            pip install --user -r requirements.txt
-            Write-Success "Cài đặt dependencies thành công với flag --user!"
+            pip install --user -r requirements.txt --quiet
         } catch {
-            Write-Error "Không thể cài đặt dependencies ngay cả với flag --user: $_"
+            Write-Error "Không thể cài đặt dependencies."
             Read-Host "Nhấn Enter để thoát"
             exit 1
         }
     }
 
-    # Tạo batch file launcher trong thư mục user
-    $LauncherDir = Join-Path $env:USERPROFILE "AppData\Local\Microsoft\WindowsApps"
-    $LauncherPath = Join-Path $LauncherDir "cursor-set-id-tools.bat"
+    Write-Success "Cài đặt hoàn tất!"
     
-    Write-Install "Đang tạo launcher script..."
+    # Tự động chạy tool
+    Write-Install "Đang khởi động tool..."
     try {
-        $BatchContent = @"
-@echo off
-cd /d "$InstallDir"
-python main.py %*
-pause
-"@
-        Set-Content -Path $LauncherPath -Value $BatchContent -Force
-        Write-Success "Launcher script đã được tạo tại $LauncherPath"
+        Set-Location $InstallDir
+        python main.py
     } catch {
-        Write-Warning "Không thể tạo launcher trong WindowsApps. Tạo trong thư mục cài đặt thay thế."
-        $LauncherPath = Join-Path $InstallDir "run.bat"
-        $BatchContent = @"
-@echo off
-cd /d "$InstallDir"
-python main.py %*
-pause
-"@
-        Set-Content -Path $LauncherPath -Value $BatchContent -Force
-        Write-Success "Launcher script đã được tạo tại $LauncherPath"
+        Write-Warning "Không thể tự động chạy. Hãy vào thư mục $InstallDir và chạy 'python main.py'"
+        Read-Host "Nhấn Enter để thoát"
     }
-
-    # Tạo desktop shortcut
-    try {
-        $WshShell = New-Object -comObject WScript.Shell
-        $DesktopPath = [System.Environment]::GetFolderPath('Desktop')
-        $ShortcutPath = Join-Path $DesktopPath "Cursor Set ID Tools.lnk"
-        $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
-        $Shortcut.TargetPath = "python"
-        $Shortcut.Arguments = "main.py"
-        $Shortcut.WorkingDirectory = $InstallDir
-        $Shortcut.Description = "Cursor Set ID Tools"
-        $Shortcut.Save()
-        Write-Success "Desktop shortcut đã được tạo"
-    } catch {
-        Write-Warning "Không thể tạo desktop shortcut: $_"
-    }
-
-    # Cài đặt hoàn tất
-    Write-Host ""
-    Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-    Write-Host "║                    Cài Đặt Hoàn Tất!                        ║" -ForegroundColor Green
-    Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Green
-    Write-Host ""
-    Write-Success "Cursor Set ID Tools đã được cài đặt thành công!"
-    Write-Host ""
-    Write-Info "Cách chạy:"
-    Write-Host "  Cách 1: Sử dụng desktop shortcut 'Cursor Set ID Tools'" -ForegroundColor White
-    Write-Host "  Cách 2: Chạy 'cursor-set-id-tools' từ command prompt (nếu có)" -ForegroundColor White
-    Write-Host "  Cách 3: Điều hướng đến $InstallDir và chạy 'python main.py'" -ForegroundColor White
-    Write-Host ""
-    Write-Info "Vị trí: $InstallDir"
-    Write-Host ""
-    Write-Warning "Quan trọng: Hãy đảm bảo đóng ứng dụng Cursor trước khi sử dụng chức năng reset!"
-    Write-Host ""
-    Write-Host "$ROCKET Sẵn sàng sử dụng! Hãy chạy tool và thưởng thức!" -ForegroundColor Green
-    Write-Host ""
-    Read-Host "Nhấn Enter để thoát"
 }
 
-# Xử lý lỗi
+# Chạy cài đặt
 try {
     Install-CursorSetIdTools
 } catch {
-    Write-Error "Đã xảy ra lỗi không mong muốn: $_"
-    Write-Host "Vui lòng thử chạy script này với quyền Administrator" -ForegroundColor Yellow
-    Read-Host "Nhấn Enter để thoát"
+    Write-Error "Lỗi: $_"
     exit 1
 } 

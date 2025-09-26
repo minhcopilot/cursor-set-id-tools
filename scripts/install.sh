@@ -48,11 +48,7 @@ command_exists() {
 
 # Hàm cài đặt chính
 main() {
-    echo -e "${BLUE}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║              Trình Cài Đặt Cursor Set ID Tools               ║${NC}"
-    echo -e "${BLUE}║            Script Cài Đặt Tự Động cho Linux/macOS           ║${NC}"
-    echo -e "${BLUE}╚══════════════════════════════════════════════════════════════╝${NC}"
-    echo
+    print_info "Bắt đầu cài đặt Cursor Set ID Tools..."
 
     # Kiểm tra Python 3 đã được cài đặt chưa
     if ! command_exists python3; then
@@ -63,8 +59,6 @@ main() {
         exit 1
     fi
 
-    print_success "Đã tìm thấy Python 3: $(python3 --version)"
-
     # Kiểm tra pip đã được cài đặt chưa
     if ! command_exists pip3; then
         print_error "pip3 chưa được cài đặt. Vui lòng cài đặt pip3 trước."
@@ -73,8 +67,6 @@ main() {
         echo "macOS: python3 -m ensurepip --upgrade"
         exit 1
     fi
-
-    print_success "Đã tìm thấy pip3: $(pip3 --version)"
 
     # Kiểm tra git đã được cài đặt chưa
     if ! command_exists git; then
@@ -85,25 +77,20 @@ main() {
         exit 1
     fi
 
-    print_success "Đã tìm thấy Git: $(git --version)"
-
     # Thiết lập thư mục cài đặt
     INSTALL_DIR="$HOME/cursor-set-id-tools"
-    
-    print_info "Thư mục cài đặt: $INSTALL_DIR"
 
     # Xóa thư mục hiện có nếu tồn tại
     if [ -d "$INSTALL_DIR" ]; then
-        print_warning "Thư mục $INSTALL_DIR đã tồn tại. Đang xóa..."
         rm -rf "$INSTALL_DIR"
     fi
 
     # Clone repository
-    print_install "Đang clone repository cursor-set-id-tools..."
-    if git clone https://github.com/minhcopilot/cursor-set-id-tools.git "$INSTALL_DIR"; then
-        print_success "Clone repository thành công!"
+    print_install "Đang tải xuống..."
+    if git clone https://github.com/minhcopilot/cursor-set-id-tools.git "$INSTALL_DIR" &>/dev/null; then
+        :
     else
-        print_error "Không thể clone repository. Vui lòng kiểm tra kết nối internet."
+        print_error "Không thể tải xuống. Vui lòng kiểm tra kết nối internet."
         exit 1
     fi
 
@@ -111,59 +98,28 @@ main() {
     cd "$INSTALL_DIR"
 
     # Cài đặt Python dependencies
-    print_install "Đang cài đặt Python dependencies..."
-    if pip3 install -r requirements.txt; then
-        print_success "Cài đặt dependencies thành công!"
+    print_install "Đang cài đặt..."
+    if pip3 install -r requirements.txt --quiet; then
+        :
     else
-        print_error "Không thể cài đặt dependencies. Thử với user flag..."
-        if pip3 install --user -r requirements.txt; then
-            print_success "Cài đặt dependencies thành công với user flag!"
+        if pip3 install --user -r requirements.txt --quiet; then
+            :
         else
-            print_error "Không thể cài đặt dependencies ngay cả với user flag."
+            print_error "Không thể cài đặt dependencies."
             exit 1
         fi
     fi
 
-    # Tạo launcher script đơn giản
-    LAUNCHER_SCRIPT="$HOME/.local/bin/cursor-set-id-tools"
+    print_success "Cài đặt hoàn tất!"
     
-    # Tạo thư mục .local/bin nếu chưa tồn tại
-    mkdir -p "$HOME/.local/bin"
-    
-    print_install "Đang tạo launcher script..."
-    cat > "$LAUNCHER_SCRIPT" << EOF
-#!/bin/bash
-cd "$INSTALL_DIR"
-python3 main.py "\$@"
-EOF
-
-    chmod +x "$LAUNCHER_SCRIPT"
-    print_success "Launcher script đã được tạo tại $LAUNCHER_SCRIPT"
-
-    # Thêm vào PATH nếu chưa có
-    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
-        print_info "Đã thêm $HOME/.local/bin vào PATH trong .bashrc"
-        print_warning "Vui lòng chạy 'source ~/.bashrc' hoặc khởi động lại terminal để sử dụng lệnh 'cursor-set-id-tools'"
+    # Tự động chạy tool
+    print_install "Đang khởi động tool..."
+    if cd "$INSTALL_DIR" && python3 main.py; then
+        :
+    else
+        print_warning "Không thể tự động chạy. Hãy vào thư mục $INSTALL_DIR và chạy 'python3 main.py'"
     fi
-
-    echo
-    echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║                    Cài Đặt Hoàn Tất!                        ║${NC}"
-    echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
-    echo
-    print_success "Cursor Set ID Tools đã được cài đặt thành công!"
-    echo
-    print_info "Cách chạy:"
-    echo "  Cách 1: cursor-set-id-tools (nếu PATH đã được cập nhật)"
-    echo "  Cách 2: cd $INSTALL_DIR && python3 main.py"
-    echo
-    print_info "Vị trí: $INSTALL_DIR"
-    echo
-    print_warning "Quan trọng: Hãy đảm bảo đóng ứng dụng Cursor trước khi sử dụng chức năng reset!"
-    echo
-    echo -e "${ROCKET} ${GREEN}Sẵn sàng sử dụng! Hãy chạy tool và thưởng thức!${NC}"
 }
 
-# Chạy hàm main
-main "$@" 
+# Chạy cài đặt
+main 

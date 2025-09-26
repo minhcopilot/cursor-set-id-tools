@@ -24,27 +24,27 @@ $EMOJI_ROCKET = "🚀"
 $EMOJI_WARNING = "⚠️"
 
 # Hàm in output có màu
-function Write-Info {
+function Show-Info {
     param([string]$Message)
     Write-Host "$EMOJI_INFO $Message" -ForegroundColor $ColorInfo
 }
 
-function Write-Success {
+function Show-Success {
     param([string]$Message)
     Write-Host "$EMOJI_SUCCESS $Message" -ForegroundColor $ColorSuccess
 }
 
-function Write-ErrorMsg {
+function Show-Error {
     param([string]$Message)
     Write-Host "$EMOJI_ERROR $Message" -ForegroundColor $ColorError
 }
 
-function Write-Warning {
+function Show-Warning {
     param([string]$Message)
     Write-Host "$EMOJI_WARNING $Message" -ForegroundColor $ColorWarning
 }
 
-function Write-Install {
+function Show-Install {
     param([string]$Message)
     Write-Host "$EMOJI_INSTALL $Message" -ForegroundColor $ColorInstall
 }
@@ -64,25 +64,25 @@ function Test-Administrator {
 
 # Hàm cài đặt chính
 function Install-CursorSetIdTools {
-    Write-Info "Bắt đầu cài đặt Cursor Set ID Tools..."
+    Show-Info "Bắt đầu cài đặt Cursor Set ID Tools..."
 
     # Kiểm tra Python đã được cài đặt chưa
     if (-not (Test-Command "python")) {
-        Write-ErrorMsg "Python chưa được cài đặt. Vui lòng cài đặt Python 3.7+ từ https://www.python.org/downloads/"
+        Show-Error "Python chưa được cài đặt. Vui lòng cài đặt Python 3.7+ từ https://www.python.org/downloads/"
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
 
     # Kiểm tra pip có sẵn không
     if (-not (Test-Command "pip")) {
-        Write-ErrorMsg "pip chưa được cài đặt. Vui lòng cài đặt lại Python với pip đi kèm"
+        Show-Error "pip chưa được cài đặt. Vui lòng cài đặt lại Python với pip đi kèm"
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
 
     # Kiểm tra git đã được cài đặt chưa
     if (-not (Test-Command "git")) {
-        Write-ErrorMsg "Git chưa được cài đặt. Vui lòng cài đặt Git từ https://git-scm.com/download/win"
+        Show-Error "Git chưa được cài đặt. Vui lòng cài đặt Git từ https://git-scm.com/download/win"
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
@@ -95,18 +95,18 @@ function Install-CursorSetIdTools {
         try {
             Remove-Item -Path $InstallDir -Recurse -Force
         } catch {
-            Write-ErrorMsg "Không thể xóa thư mục hiện có: $_"
+            Show-Error "Không thể xóa thư mục hiện có: $_"
             Read-Host "Nhấn Enter để thoát"
             exit 1
         }
     }
 
     # Clone repository
-    Write-Install "Đang tải xuống..."
+    Show-Install "Đang tải xuống..."
     try {
         git clone https://github.com/minhcopilot/cursor-set-id-tools.git $InstallDir 2>$null
     } catch {
-        Write-ErrorMsg "Không thể tải xuống. Vui lòng kiểm tra kết nối internet."
+        Show-Error "Không thể tải xuống. Vui lòng kiểm tra kết nối internet."
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
@@ -115,28 +115,28 @@ function Install-CursorSetIdTools {
     Set-Location $InstallDir
 
     # Cài đặt Python dependencies
-    Write-Install "Đang cài đặt..."
+    Show-Install "Đang cài đặt..."
     try {
         pip install -r requirements.txt --quiet
     } catch {
         try {
             pip install --user -r requirements.txt --quiet
         } catch {
-            Write-ErrorMsg "Không thể cài đặt dependencies."
+            Show-Error "Không thể cài đặt dependencies."
             Read-Host "Nhấn Enter để thoát"
             exit 1
         }
     }
 
-    Write-Success "Cài đặt hoàn tất!"
+    Show-Success "Cài đặt hoàn tất!"
     
     # Tự động chạy tool
-    Write-Install "Đang khởi động tool..."
+    Show-Install "Đang khởi động tool..."
     try {
         Set-Location $InstallDir
         python main.py
     } catch {
-        Write-Warning "Không thể tự động chạy. Hãy vào thư mục $InstallDir và chạy 'python main.py'"
+        Show-Warning "Không thể tự động chạy. Hãy vào thư mục $InstallDir và chạy 'python main.py'"
         Read-Host "Nhấn Enter để thoát"
     }
 }
@@ -145,6 +145,6 @@ function Install-CursorSetIdTools {
 try {
     Install-CursorSetIdTools
 } catch {
-    Write-ErrorMsg "Lỗi: $_"
+    Show-Error "Lỗi: $_"
     exit 1
 } 

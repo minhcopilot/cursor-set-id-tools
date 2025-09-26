@@ -1,6 +1,4 @@
-# Cursor Standalone Tools
-
-Phiên bản standalone chỉ chứa 3 chức năng chính từ Cursor Free VIP:
+# Cursor Reset ID Tools
 
 ## 🔧 Chức năng
 
@@ -21,12 +19,41 @@ Phiên bản standalone chỉ chứa 3 chức năng chính từ Cursor Free VIP:
 
 ## 📦 Cài đặt
 
-### Bước 1: Cài đặt Python Dependencies
+### ⭐ Auto Run Script (Khuyến nghị)
+
+Auto script sẽ tự động:
+- ✅ Kiểm tra và cài đặt các dependencies cần thiết
+- ✅ Clone repository từ GitHub
+- ✅ Cài đặt Python packages
+- ✅ Tạo launcher script để chạy dễ dàng
+- ✅ Tạo desktop shortcut (Windows)
+
+**Linux/macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/main/scripts/install.sh -o install.sh && chmod +x install.sh && ./install.sh
+```
+
+**Windows:**
+```powershell
+irm https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/main/scripts/install.ps1 | iex
+```
+
+> **Lưu ý:** Bạn cần cài đặt Python 3.7+, pip và Git trước khi chạy auto script.
+
+### 📖 Cài đặt thủ công
+
+#### Bước 1: Clone repository
+```bash
+git clone https://github.com/minhcopilot/cursor-set-id-tools.git
+cd cursor-set-id-tools
+```
+
+#### Bước 2: Cài đặt Python Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Bước 2: Chạy tool
+#### Bước 3: Chạy tool
 ```bash
 python main.py
 ```
@@ -71,14 +98,17 @@ Một số chức năng có thể yêu cầu quyền Administrator:
 ## 📁 Cấu trúc file
 
 ```
-cursor-standalone-tools/
+cursor-set-id-tools/
 ├── main.py              # File chính
 ├── quit_cursor.py       # Chức năng đóng Cursor
 ├── reset_machine_manual.py # Chức năng reset Machine ID
-├── config.py            # Configuration management
-├── utils.py             # Utility functions
-├── logo.py              # Logo display
-├── locales/             # Translation files
+├── config.py            # Quản lý cấu hình
+├── utils.py             # Các hàm tiện ích
+├── logo.py              # Hiển thị logo
+├── scripts/             # Script cài đặt tự động
+│   ├── install.sh       # Auto install cho Linux/macOS
+│   └── install.ps1      # Auto install cho Windows
+├── locales/             # File dịch ngôn ngữ
 │   ├── en.json
 │   ├── vi.json
 │   └── ...
@@ -110,4 +140,4 @@ pip install -r requirements.txt
 
 ## 📄 License
 
-Based on the original Cursor Free VIP project. 
+Dựa trên dự án Cursor Free VIP gốc. 

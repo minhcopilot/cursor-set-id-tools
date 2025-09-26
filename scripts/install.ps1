@@ -16,37 +16,37 @@ $ColorWarning = "Yellow"
 $ColorInstall = "Magenta"
 
 # Biểu tượng
-$SUCCESS = "✅"
-$ERROR = "❌"
-$INFO = "ℹ️"
-$INSTALL = "📦"
-$ROCKET = "🚀"
-$WARNING = "⚠️"
+$EMOJI_SUCCESS = "✅"
+$EMOJI_ERROR = "❌"
+$EMOJI_INFO = "ℹ️"
+$EMOJI_INSTALL = "📦"
+$EMOJI_ROCKET = "🚀"
+$EMOJI_WARNING = "⚠️"
 
 # Hàm in output có màu
 function Write-Info {
     param([string]$Message)
-    Write-Host "$INFO $Message" -ForegroundColor $ColorInfo
+    Write-Host "$EMOJI_INFO $Message" -ForegroundColor $ColorInfo
 }
 
 function Write-Success {
     param([string]$Message)
-    Write-Host "$SUCCESS $Message" -ForegroundColor $ColorSuccess
+    Write-Host "$EMOJI_SUCCESS $Message" -ForegroundColor $ColorSuccess
 }
 
-function Write-Error {
+function Write-ErrorMsg {
     param([string]$Message)
-    Write-Host "$ERROR $Message" -ForegroundColor $ColorError
+    Write-Host "$EMOJI_ERROR $Message" -ForegroundColor $ColorError
 }
 
 function Write-Warning {
     param([string]$Message)
-    Write-Host "$WARNING $Message" -ForegroundColor $ColorWarning
+    Write-Host "$EMOJI_WARNING $Message" -ForegroundColor $ColorWarning
 }
 
 function Write-Install {
     param([string]$Message)
-    Write-Host "$INSTALL $Message" -ForegroundColor $ColorInstall
+    Write-Host "$EMOJI_INSTALL $Message" -ForegroundColor $ColorInstall
 }
 
 # Hàm kiểm tra lệnh có tồn tại không
@@ -68,21 +68,21 @@ function Install-CursorSetIdTools {
 
     # Kiểm tra Python đã được cài đặt chưa
     if (-not (Test-Command "python")) {
-        Write-Error "Python chưa được cài đặt. Vui lòng cài đặt Python 3.7+ từ https://www.python.org/downloads/"
+        Write-ErrorMsg "Python chưa được cài đặt. Vui lòng cài đặt Python 3.7+ từ https://www.python.org/downloads/"
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
 
     # Kiểm tra pip có sẵn không
     if (-not (Test-Command "pip")) {
-        Write-Error "pip chưa được cài đặt. Vui lòng cài đặt lại Python với pip đi kèm"
+        Write-ErrorMsg "pip chưa được cài đặt. Vui lòng cài đặt lại Python với pip đi kèm"
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
 
     # Kiểm tra git đã được cài đặt chưa
     if (-not (Test-Command "git")) {
-        Write-Error "Git chưa được cài đặt. Vui lòng cài đặt Git từ https://git-scm.com/download/win"
+        Write-ErrorMsg "Git chưa được cài đặt. Vui lòng cài đặt Git từ https://git-scm.com/download/win"
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
@@ -95,7 +95,7 @@ function Install-CursorSetIdTools {
         try {
             Remove-Item -Path $InstallDir -Recurse -Force
         } catch {
-            Write-Error "Không thể xóa thư mục hiện có: $_"
+            Write-ErrorMsg "Không thể xóa thư mục hiện có: $_"
             Read-Host "Nhấn Enter để thoát"
             exit 1
         }
@@ -106,7 +106,7 @@ function Install-CursorSetIdTools {
     try {
         git clone https://github.com/minhcopilot/cursor-set-id-tools.git $InstallDir 2>$null
     } catch {
-        Write-Error "Không thể tải xuống. Vui lòng kiểm tra kết nối internet."
+        Write-ErrorMsg "Không thể tải xuống. Vui lòng kiểm tra kết nối internet."
         Read-Host "Nhấn Enter để thoát"
         exit 1
     }
@@ -122,7 +122,7 @@ function Install-CursorSetIdTools {
         try {
             pip install --user -r requirements.txt --quiet
         } catch {
-            Write-Error "Không thể cài đặt dependencies."
+            Write-ErrorMsg "Không thể cài đặt dependencies."
             Read-Host "Nhấn Enter để thoát"
             exit 1
         }
@@ -145,6 +145,6 @@ function Install-CursorSetIdTools {
 try {
     Install-CursorSetIdTools
 } catch {
-    Write-Error "Lỗi: $_"
+    Write-ErrorMsg "Lỗi: $_"
     exit 1
 } 

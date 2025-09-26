@@ -30,12 +30,12 @@ Auto script sẽ tự động:
 
 **Linux/macOS:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/main/scripts/install.sh -o install.sh && chmod +x install.sh && ./install.sh
+curl -fsSL https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/refs/heads/main/scripts/install.sh -o install.sh && chmod +x install.sh && ./install.sh
 ```
 
 **Windows:**
 ```powershell
-irm https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/refs/heads/main/scripts/install.ps1 | iex
 ```
 
 > **Lưu ý:** Bạn cần cài đặt Python 3.7+, pip và Git trước khi chạy auto script.

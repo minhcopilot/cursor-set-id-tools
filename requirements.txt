@@ -1,0 +1,11 @@
+# Dependencies for Cursor Standalone Tools
+# Core dependencies
+colorama>=0.4.6
+psutil>=5.8.0
+
+# Windows specific (for registry access and admin operations)
+pywin32; platform_system == "Windows"
+
+# Optional - for Arabic language support
+arabic-reshaper
+python-bidi 

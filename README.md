@@ -137,7 +137,3 @@ cursor-set-id-tools/
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
-
-## 📄 License
-
-Dựa trên dự án Cursor Free VIP gốc. 

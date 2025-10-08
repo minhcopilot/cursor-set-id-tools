@@ -64,25 +64,6 @@ python main.py
 - ✅ macOS
 - ✅ Linux (Ubuntu, Debian, Fedora, etc.)
 
-## 🌍 Ngôn ngữ hỗ trợ
-
-Tool hỗ trợ đa ngôn ngữ với hệ thống translation tự động:
-- 🇺🇸 English
-- 🇻🇳 Tiếng Việt  
-- 🇨🇳 中文 (简体)
-- 🇹🇼 中文 (繁體)
-- 🇯🇵 日本語
-- 🇩🇪 Deutsch
-- 🇫🇷 Français
-- 🇪🇸 Español
-- 🇮🇹 Italiano
-- 🇷🇺 Русский
-- 🇸🇦 العربية
-- 🇹🇷 Türkçe
-- 🇳🇱 Nederlands
-- 🇧🇬 Български
-- 🇵🇹 Português
-
 ## ⚙️ Cấu hình
 
 Tool sẽ tự động tạo file cấu hình tại:

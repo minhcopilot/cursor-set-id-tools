@@ -244,20 +244,51 @@ function Install-CursorSetIdTools {
         # Try to upgrade pip first
         python -m pip install --upgrade pip --quiet 2>$null
         
-        # Install from requirements.txt
-        python -m pip install -r requirements.txt --quiet
-        Show-Success "Da cai dat tat ca thu vien thanh cong!"
-    } catch {
-        Show-Warning "Thu cai dat voi quyen user..."
-        try {
-            python -m pip install --user -r requirements.txt --quiet
-            Show-Success "Da cai dat tat ca thu vien thanh cong!"
-        } catch {
-            Show-Error "Khong the cai dat dependencies: $_"
-            Show-Info "Ban co the thu cai dat thu cong: pip install -r requirements.txt"
-            Read-Host "Nhan Enter de thoat"
-            exit 1
+        # Install from requirements.txt with better error handling
+        $retryCount = 0
+        $maxRetries = 3
+        $success = $false
+        
+        while ($retryCount -lt $maxRetries -and -not $success) {
+            try {
+                # Remove --quiet to see actual errors, redirect to variable
+                $output = python -m pip install -r requirements.txt --no-cache-dir 2>&1
+                $exitCode = $LASTEXITCODE
+                
+                if ($exitCode -eq 0) {
+                    $success = $true
+                    Show-Success "Da cai dat tat ca thu vien thanh cong!"
+                } else {
+                    throw "pip install failed with exit code: $exitCode"
+                }
+            } catch {
+                $retryCount++
+                if ($retryCount -lt $maxRetries) {
+                    Show-Warning "Thu lai lan $retryCount..."
+                    Start-Sleep -Seconds 2
+                } else {
+                    Show-Warning "Loi khi cai dat: $_"
+                }
+            }
         }
+        
+        if (-not $success) {
+            Show-Warning "Thu cai dat voi quyen user..."
+            $output = python -m pip install --user -r requirements.txt --no-cache-dir 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Show-Success "Da cai dat tat ca thu vien thanh cong!"
+                $success = $true
+            }
+        }
+        
+        if (-not $success) {
+            throw "Khong the cai dat sau $maxRetries lan thu"
+        }
+    } catch {
+        Show-Error "Khong the cai dat dependencies: $_"
+        Show-Info "Ban co the thu cai dat thu cong: cd $InstallDir ; pip install -r requirements.txt"
+        Read-Host "Nhan Enter de thoat"
+        exit 1
     }
 
     Show-Success "Cai dat hoan tat!"

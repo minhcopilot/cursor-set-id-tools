@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import shutil
 import re
+import sys
 
 # Get the current script directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,13 +15,22 @@ load_dotenv(env_path)
 # Get the version number, using the default value if not found
 version = os.getenv('VERSION', '1.0.0')
 
-# Initialize colorama
-init()
+# Initialize colorama with autoreset and convert for Windows
+init(autoreset=True, convert=True)
+
+# Fix Windows console encoding
+if sys.platform == 'win32':
+    try:
+        import codecs
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    except:
+        pass
 
 # get terminal width
 def get_terminal_width():
     try:
-        columns, _ = shutil.get_terminal_size()/2
+        columns, _ = shutil.get_terminal_size()
         return columns
     except:
         return 80  # default width
@@ -93,8 +103,18 @@ CURSOR_OTHER_INFO = center_multiline_text(OTHER_INFO_TEXT, handle_chinese=True)
 
 def print_logo():
     # Simplified version - no ASCII art
-    print(f"\n{Fore.CYAN}🔧 công cụ Đặt lại ID máy {Style.RESET_ALL} của tkcursor.pro")
-    print(f"{Fore.YELLOW}{'─' * 50}{Style.RESET_ALL}")
+    try:
+        print(f"\n{Fore.CYAN}🔧 Công cụ Đặt lại ID máy {Style.RESET_ALL}của tkcursor.pro")
+    except (UnicodeEncodeError, Exception):
+        # Fallback for Windows console that doesn't support emoji/Vietnamese
+        try:
+            print(f"\n{Fore.CYAN}[*] Cong cu Dat lai ID may {Style.RESET_ALL}cua tkcursor.pro")
+        except:
+            print("\n[*] Cursor Set ID Tools - tkcursor.pro")
+    try:
+        print(f"{Fore.YELLOW}{'─' * 50}{Style.RESET_ALL}")
+    except:
+        print(f"{Fore.YELLOW}{'-' * 50}{Style.RESET_ALL}")
 
 if __name__ == "__main__":
     print_logo()

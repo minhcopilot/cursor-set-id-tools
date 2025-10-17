@@ -2,6 +2,7 @@
 # Core dependencies
 colorama>=0.4.6
 psutil>=5.8.0
+python-dotenv>=1.0.0
 
 # Windows specific (for registry access and admin operations)
 pywin32; platform_system == "Windows"

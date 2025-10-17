@@ -299,18 +299,39 @@ main() {
     # Try to upgrade pip
     $PIP_CMD install --upgrade pip --quiet --user 2>/dev/null || true
     
-    # Install requirements
-    if $PIP_CMD install -r requirements.txt --quiet 2>/dev/null; then
-        print_success "Da cai dat tat ca thu vien thanh cong!"
-    else
-        print_warning "Thu cai dat voi quyen user..."
-        if $PIP_CMD install --user -r requirements.txt --quiet 2>/dev/null; then
+    # Install requirements with retries and better error handling
+    retry_count=0
+    max_retries=3
+    success=false
+    
+    while [ $retry_count -lt $max_retries ] && [ "$success" = false ]; do
+        # Remove --quiet to see actual errors
+        if $PIP_CMD install -r requirements.txt --no-cache-dir 2>&1; then
+            success=true
             print_success "Da cai dat tat ca thu vien thanh cong!"
         else
-            print_error "Khong the cai dat dependencies"
-            print_info "Ban co the thu cai dat thu cong: pip3 install -r requirements.txt"
-            exit 1
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                print_warning "Thu lai lan $retry_count..."
+                sleep 2
+            else
+                print_warning "Gap loi khi cai dat, thu voi quyen user..."
+            fi
         fi
+    done
+    
+    if [ "$success" = false ]; then
+        print_warning "Thu cai dat voi quyen user..."
+        if $PIP_CMD install --user -r requirements.txt --no-cache-dir 2>&1; then
+            print_success "Da cai dat tat ca thu vien thanh cong!"
+            success=true
+        fi
+    fi
+    
+    if [ "$success" = false ]; then
+        print_error "Khong the cai dat dependencies"
+        print_info "Ban co the thu cai dat thu cong: cd $INSTALL_DIR && pip3 install -r requirements.txt"
+        exit 1
     fi
     
     print_success "Cai dat hoan tat!"

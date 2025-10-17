@@ -38,7 +38,11 @@ curl -fsSL https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/ref
 irm https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/refs/heads/main/scripts/install.ps1 | iex
 ```
 
-> **Lưu ý:** Bạn cần cài đặt Python 3.7+, pip và Git trước khi chạy auto script.
+> **✨ Tính năng mới:** Script cài đặt đã được cập nhật để **TỰ ĐỘNG CÀI ĐẶT** Python, pip và Git nếu chưa có trên cả **Windows, Linux và macOS**! Bạn chỉ cần chạy lệnh trên và script sẽ lo tất cả.
+>
+> - **Windows**: Tự động cài Python 3.12 và Git qua winget hoặc tải installer
+> - **macOS**: Tự động cài Homebrew (nếu chưa có), sau đó cài Python3 và Git
+> - **Linux**: Tự động phát hiện distro (Ubuntu/Debian/Fedora/CentOS/Arch) và dùng package manager phù hợp
 
 ### 📖 Cài đặt thủ công
 
@@ -106,15 +110,94 @@ cursor-set-id-tools/
 
 ## 🔧 Troubleshooting
 
-### Lỗi "Permission Denied"
+### ❌ Lỗi "Python chưa được cài đặt" hoặc "Git chưa được cài đặt"
+
+#### **Giải pháp tự động (Windows):**
+Script `install.ps1` đã được cập nhật để **tự động cài đặt** Python và Git nếu chưa có. Chỉ cần chạy:
+```powershell
+irm https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/refs/heads/main/scripts/install.ps1 | iex
+```
+
+#### **Giải pháp tự động (Linux/macOS):**
+Script `install.sh` cũng đã được cập nhật để **tự động cài đặt**. Chỉ cần chạy:
+```bash
+curl -fsSL https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/refs/heads/main/scripts/install.sh -o install.sh && chmod +x install.sh && ./install.sh
+```
+
+Script sẽ tự động:
+1. ✅ Phát hiện hệ điều hành và distro
+2. ✅ Kiểm tra Python3, nếu chưa có → cài đặt tự động
+3. ✅ Kiểm tra Git, nếu chưa có → cài đặt tự động
+4. ✅ Kiểm tra và kích hoạt pip
+5. ✅ Cài đặt tất cả thư viện Python cần thiết
+6. ✅ Tự động chạy tool
+
+**Hỗ trợ các distro Linux:**
+- Ubuntu/Debian (dùng `apt`)
+- Fedora (dùng `dnf`)
+- CentOS/RHEL (dùng `yum`)
+- Arch/Manjaro (dùng `pacman`)
+
+**macOS:**
+- Tự động cài Homebrew nếu chưa có
+- Tự động cài Python3 và Git qua Homebrew
+
+**Giải pháp thủ công:**
+- **Windows**: Python từ [python.org](https://www.python.org/downloads/), Git từ [git-scm.com](https://git-scm.com/download/win)
+- **macOS**: `brew install python3 git`
+- **Ubuntu/Debian**: `sudo apt install python3 python3-pip git`
+- **Fedora**: `sudo dnf install python3 python3-pip git`
+- **Arch**: `sudo pacman -S python python-pip git`
+
+### ❌ Lỗi "pip chưa được cài đặt"
+
+Script đã được cập nhật để tự động khắc phục:
+- Tự động chạy `python -m ensurepip` để kích hoạt pip
+- Nếu vẫn lỗi, hãy cài đặt lại Python và chọn tích "Include pip"
+
+### ❌ Lỗi "Permission Denied"
 - Chạy với quyền Administrator (Windows) hoặc sudo (Linux/macOS)
 
-### Lỗi "Cursor not found"
+### ❌ Lỗi "Cursor not found"
 - Kiểm tra xem Cursor đã được cài đặt chưa
 - Cập nhật đường dẫn trong config file nếu cần
 
-### Lỗi Dependencies
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
+### ⚠️ Script không chạy được trên Windows
+
+Nếu gặp lỗi "running scripts is disabled on this system":
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+
+Sau đó chạy lại lệnh cài đặt:
+```powershell
+irm https://raw.githubusercontent.com/minhcopilot/cursor-set-id-tools/refs/heads/main/scripts/install.ps1 | iex
+```
+
+### 🔄 Sau khi cài đặt Python/Git, script vẫn báo lỗi
+
+**Windows:** Hãy **khởi động lại PowerShell** hoặc **mở PowerShell mới** và chạy lại lệnh cài đặt. Điều này để PATH được cập nhật.
+
+**Linux/macOS:** Hãy **khởi động lại Terminal** hoặc chạy `source ~/.bashrc` (hoặc `source ~/.zshrc` nếu dùng zsh).
+
+### ⚠️ Lỗi "sudo: command not found" hoặc không có quyền sudo (Linux)
+
+Nếu script yêu cầu sudo để cài đặt nhưng bạn không có quyền:
+
+**Cách 1:** Liên hệ admin hệ thống để cài đặt Python3, pip và Git
+**Cách 2:** Cài đặt Python trong user space (không cần sudo):
+```bash
+# Dùng pyenv để cài Python không cần sudo
+curl https://pyenv.run | bash
+pyenv install 3.12.0
+pyenv global 3.12.0
+```
+
+### 🍎 Lỗi trên macOS: "xcrun: error: invalid active developer path"
+
+Chạy lệnh này để cài đặt Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
+
+Sau đó chạy lại script cài đặt.

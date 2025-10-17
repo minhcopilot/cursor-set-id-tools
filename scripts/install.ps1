@@ -297,5 +297,3 @@ try {
     Read-Host "Nhan Enter de thoat"
     exit 1
 }
-
-} 
